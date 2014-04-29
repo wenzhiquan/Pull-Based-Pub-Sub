@@ -27,7 +27,7 @@ public class TopicDao {
 			ResultSet rs = stmt.executeQuery("select * from topics");
 			while(rs.next()){
 				Topic topic = new Topic();
-				topic.setTopicName(rs.getString(2));
+				topic.setTopicName(rs.getString(1));
 				
 				topicList.add(topic);
 			}

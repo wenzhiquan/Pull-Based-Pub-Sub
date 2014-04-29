@@ -99,7 +99,9 @@ public class ClientLogin extends JFrame{
 							//read user's type from server
 							if(result.equals("true")){
 								//if user's type is 1, create publisher's client
-								new Client(username);
+								String topics = fromServer.readUTF();
+								int topicNum = fromServer.readInt();
+								new Client(username, topics, topicNum);
 								if(socket != null)
 									socket.close();
 								dispose();

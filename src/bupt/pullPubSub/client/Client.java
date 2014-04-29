@@ -40,9 +40,6 @@ public class Client extends JFrame{
 	
 	private JPanel jpSub = new JPanel();
 	private JPanel subClasses = new JPanel();
-	private JCheckBox jckNewsSub = new JCheckBox();
-	private JCheckBox jckBooksSub = new JCheckBox();
-	private JCheckBox jckSportsSub = new JCheckBox();
 	private JButton subSubmit = new JButton("Submit");
 	
 	private JPanel jpPub = new JPanel();
@@ -66,6 +63,8 @@ public class Client extends JFrame{
 	private JLabel jlNewPwd = new JLabel();
 	private JLabel jlConfirmPwd = new JLabel();
 	
+	private JCheckBox[] jck;
+	
 	private int windowWidth = 320;
 	private int windowHeight = 450;
 	
@@ -75,10 +74,9 @@ public class Client extends JFrame{
 		
 	}
 	
-	public Client(final String username){
-		
+	public Client(final String username, final String topics, final int topicNum){
 		/*initialize the publisher's client*/
-		initialFrame(username);
+		initialFrame(username, topics, topicNum);
 		
 		final Socket socket = new Socket();
 		
@@ -223,16 +221,14 @@ public class Client extends JFrame{
 				public void actionPerformed(ActionEvent e) {
 					try{
 						subToServer = "";
+						String[] s;
+						s = topics.split("\n");
+						for(int i = 0;i<topicNum;i++){
+							if(jck[i].isSelected() == true){
+								subToServer = subToServer.concat(s[i] + "\n");
+							}
+						}
 						
-						if(jckNewsSub.isSelected() == true){
-							subToServer = subToServer.concat("N");
-						}
-						if(jckBooksSub.isSelected() == true){
-							subToServer = subToServer.concat("B");
-						}
-						if(jckSportsSub.isSelected() == true){
-							subToServer = subToServer.concat("S");
-						}
 						
 						try{
 							toServer.writeUTF("ChangeClass");
@@ -320,12 +316,13 @@ public class Client extends JFrame{
 							try{								
 								toServer.writeUTF("getClass");
 								String subscribeClasses = fromServer.readUTF();
-								if(subscribeClasses.contains("News"))
-									jckNewsSub.setSelected(true);
-								if(subscribeClasses.contains("Books"))
-									jckBooksSub.setSelected(true);
-								if(subscribeClasses.contains("Sports"))
-									jckSportsSub.setSelected(true);
+								String[] s;
+								s = topics.split("\n");
+								for(int i = 0;i<topicNum;i++){
+									if(subscribeClasses.contains(s[i])){
+										jck[i].setSelected(true);
+									}
+								}
 							}catch(InterruptedIOException ex){
 								System.err.print("timeout on read");
 							}
@@ -394,7 +391,8 @@ public class Client extends JFrame{
 		}
 	}
 	
-	public void initialFrame(String username){
+	public void initialFrame(String username, String topics, int topicNum){
+		
 		jpInfo.setLayout(new BorderLayout());
 		jta.setSize(10, 5);
 		jta.setLineWrap(true);
@@ -403,18 +401,22 @@ public class Client extends JFrame{
 		jpInfo.add(spInfo, BorderLayout.CENTER);
 		jpInfo.add(refreshBtn, BorderLayout.SOUTH);
 		spInfo.add(jta);
+
+		String[] s;
+		s = topics.split("\n");
+
+		jck = new JCheckBox[topicNum];
+		for(int i=0;i<topicNum;i++){
+			jck[i] = new JCheckBox();
+			jck[i].setText(s[i]);
+			subClasses.add(jck[i]);
+		}
 		
-		jckNewsSub.setText("News");
-		jckBooksSub.setText("Books");
-		jckSportsSub.setText("Sports");
 		jrbNewsPub.setText("News");
 		jrbBooksPub.setText("Books");
 		jrbSportsPub.setText("Sports");
 		
 		subClasses.setBorder(new TitledBorder("Classes"));
-		subClasses.add(jckNewsSub);
-		subClasses.add(jckBooksSub);
-		subClasses.add(jckSportsSub);
 		jpSub.setLayout(new BorderLayout());
 		jpSub.add(subClasses, BorderLayout.CENTER);
 		jpSub.add(subSubmit, BorderLayout.SOUTH);
@@ -509,10 +511,6 @@ public class Client extends JFrame{
 		
 		
 		
-	}
-	
-	public static void main(String[] args) {
-		new Client("admin");
 	}
 
 }

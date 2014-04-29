@@ -4,7 +4,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.List;
 
+import bupt.pullPubSub.database.Topic;
+import bupt.pullPubSub.database.TopicDao;
 import bupt.pullPubSub.database.User;
 import bupt.pullPubSub.database.UserDao;
 
@@ -28,6 +31,16 @@ public class Login {
 					//if exist, return "true" and user's type to client
 					if(user.getPassword().equals(userSearch.getPassword())){
 						toClient.writeUTF("true");
+						List<Topic> topicList = TopicDao.getInstance().getAllTopics();
+						 
+						 String topics = "";
+						 //write all subscribe classes into a string
+						 System.out.println(topicList.size());
+						 for(int i = 0;i<topicList.size();i++)
+							 topics = topics.concat(topicList.get(i).getTopicName() + "\n");
+						 //write the string to client
+						 toClient.writeUTF(topics);
+						 toClient.writeInt(topicList.size());
 						setUsername(userSearch.getUsername());
 					}
 					//if does not exist, return "false" and 0 to client
