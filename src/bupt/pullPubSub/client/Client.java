@@ -45,9 +45,6 @@ public class Client extends JFrame{
 	private JPanel jpPub = new JPanel();
 	private JTextField jtfTitle = new JTextField();
 	private JTextArea jtfContent = new JTextArea();
-	private JRadioButton jrbNewsPub = new JRadioButton();
-	private JRadioButton jrbBooksPub = new JRadioButton();
-	private JRadioButton jrbSportsPub = new JRadioButton();
 	private ScrollPane spPub = new ScrollPane();
 	private JPanel pubClasses = new JPanel();
 	private JPanel pubContentPane = new JPanel();
@@ -64,6 +61,8 @@ public class Client extends JFrame{
 	private JLabel jlConfirmPwd = new JLabel();
 	
 	private JCheckBox[] jck;
+	private JRadioButton[] jrb;
+	private ButtonGroup group = new ButtonGroup();
 	
 	private int windowWidth = 320;
 	private int windowHeight = 450;
@@ -93,29 +92,10 @@ public class Client extends JFrame{
 			}
 			
 			/*only one radio button can be chose*/
-			jrbNewsPub.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					jrbBooksPub.setSelected(false);
-					jrbSportsPub.setSelected(false);
-				}
-				
-			});
 			
-			jrbBooksPub.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					jrbNewsPub.setSelected(false);
-					jrbSportsPub.setSelected(false);
-				}
-				
-			});
-			
-			jrbSportsPub.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					jrbBooksPub.setSelected(false);
-					jrbNewsPub.setSelected(false);
-				}
-				
-			});
+			for(int i=0;i<topicNum;i++){
+				group.add(jrb[i]);
+			}
 			
 			refreshBtn.addActionListener(new ActionListener(){
 
@@ -166,22 +146,26 @@ public class Client extends JFrame{
 					
 					try {
 						
-		                if(jrbNewsPub.isSelected() || jrbBooksPub.isSelected() || jrbSportsPub.isSelected())
-		                	isClassChosen = true;
+						for(int i=0;i<topicNum;i++){
+							if(jrb[i].isSelected() == true)
+			                	isClassChosen = true;
+						}
+		                
 						
 						if(isClassChosen == true){
 			                try{
 				                //send file to server
 				                toServer.writeUTF("Publish");
 								//write file's class
-								if(jrbNewsPub.isSelected() == true){
-									toServer.writeUTF("News");
-								}else if(jrbBooksPub.isSelected() == true){
-									toServer.writeUTF("Books");
-								}else if(jrbSportsPub.isSelected() == true){
-									toServer.writeUTF("Sports");
+				                String[] f;
+				                f = topics.split("\n");
+				                for(int i=0;i<topicNum;i++){
+									if(jrb[i].isSelected() == true)
+										toServer.writeUTF(f[i]);
 								}
+								
 								//split data with "\n"
+				                pubContentToServer = pubContentToServer.concat(jtfTitle.getText() + "\n");
 								String[] s = jtfContent.getText().split("\n");
 								s = jtfContent.getText().split("\n");
 								for (String x : s) {
@@ -222,10 +206,12 @@ public class Client extends JFrame{
 					try{
 						subToServer = "";
 						String[] s;
+						int selectedNum = 0;
 						s = topics.split("\n");
 						for(int i = 0;i<topicNum;i++){
 							if(jck[i].isSelected() == true){
 								subToServer = subToServer.concat(s[i] + "\n");
+								selectedNum++;
 							}
 						}
 						
@@ -233,6 +219,7 @@ public class Client extends JFrame{
 						try{
 							toServer.writeUTF("ChangeClass");
 							toServer.writeUTF(subToServer);
+							toServer.writeInt(selectedNum);
 							
 							if(fromServer.readUTF().equals("true")){
 								JOptionPane.showMessageDialog(null, "Successful!");
@@ -412,9 +399,12 @@ public class Client extends JFrame{
 			subClasses.add(jck[i]);
 		}
 		
-		jrbNewsPub.setText("News");
-		jrbBooksPub.setText("Books");
-		jrbSportsPub.setText("Sports");
+		jrb = new JRadioButton[topicNum];
+		for(int i=0;i<topicNum;i++){
+			jrb[i] = new JRadioButton();
+			jrb[i].setText(s[i]);
+			pubClasses.add(jrb[i]);
+		}
 		
 		subClasses.setBorder(new TitledBorder("Classes"));
 		jpSub.setLayout(new BorderLayout());
@@ -424,9 +414,6 @@ public class Client extends JFrame{
 		jtfTitle.setText("Title");
 		jtfContent.setText("Content");
 		spPub.add(jtfContent);
-		pubClasses.add(jrbNewsPub);
-		pubClasses.add(jrbBooksPub);
-		pubClasses.add(jrbSportsPub);
 		pubClasses.setBorder(new TitledBorder("Classes"));
 		pubContentPane.setLayout(new BorderLayout());
 		pubContentPane.add(spPub, BorderLayout.CENTER);

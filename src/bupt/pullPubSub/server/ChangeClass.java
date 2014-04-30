@@ -20,6 +20,7 @@ public class ChangeClass {
 			try{
 				//get user's subscribe classes from client
 				subClasses = fromClient.readUTF();
+				int selectedNum = fromClient.readInt();
 				//delete the old subscribe classes
 				SubscribeDao.getInstance().deleteSubscribe(username);
 				//if client subscribe nothing
@@ -28,16 +29,10 @@ public class ChangeClass {
 				}
 				else{
 					//if client subscribe news
-					if(subClasses.contains("N")){
-						result = SubscribeDao.getInstance().saveSubscribe(username, "News");
-					}
-					//if client subscribe books
-					if(subClasses.contains("B")){
-						result = SubscribeDao.getInstance().saveSubscribe(username, "Books");
-					}
-					//if client subscribe sports
-					if(subClasses.contains("S")){
-						result = SubscribeDao.getInstance().saveSubscribe(username, "Sports");
+					String[] s;
+					s = subClasses.split("\n");
+					for(int i=0;i<selectedNum;i++){
+						result = SubscribeDao.getInstance().saveSubscribe(username, s[i]);
 					}
 					
 					SimpleDateFormat format=new SimpleDateFormat("yyyyMMddhhmmss");
