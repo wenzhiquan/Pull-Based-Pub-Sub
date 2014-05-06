@@ -206,7 +206,7 @@ public class Client extends JFrame {
 			});
 		} catch (IOException e1) {
 			JOptionPane.showMessageDialog(null,
-					"Create I/O stream failed! Please try again!");s
+					"Create I/O stream failed! Please try again!");
 			e1.printStackTrace();
 		}
 	}
