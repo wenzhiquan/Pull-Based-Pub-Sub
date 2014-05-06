@@ -6,19 +6,19 @@ public class Message {
 	private String publisher;
 	private String topicName;
 	private String pubTime;
-	
+
 	public int getMsgID() {
 		return msgID;
 	}
-	
+
 	public void setMsgID(int msgID) {
 		this.msgID = msgID;
 	}
-	
+
 	public String getMsgContent() {
 		return msgContent;
 	}
-	
+
 	public void setMsgContent(String msgContent) {
 		this.msgContent = msgContent;
 	}
@@ -46,6 +46,5 @@ public class Message {
 	public void setPubTime(String pubTime) {
 		this.pubTime = pubTime;
 	}
-	
-	
+
 }

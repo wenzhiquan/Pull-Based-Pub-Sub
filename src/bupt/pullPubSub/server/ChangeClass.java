@@ -12,43 +12,46 @@ import bupt.pullPubSub.database.SubscribeDao;
 public class ChangeClass {
 	private boolean result = false;
 	private String subClasses;
-	
-	public ChangeClass(DataInputStream fromClient, DataOutputStream toClient, String username){
-		
+
+	public ChangeClass(DataInputStream fromClient, DataOutputStream toClient,
+			String username) {
+
 		try {
-			
-			try{
-				//get user's subscribe classes from client
+
+			try {
+
+				SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmss");
+				String sdf = format.format(new Date());
+				// get user's subscribe classes from client
 				subClasses = fromClient.readUTF();
 				int selectedNum = fromClient.readInt();
-				//delete the old subscribe classes
+				// delete the old subscribe classes
 				SubscribeDao.getInstance().deleteSubscribe(username);
-				//if client subscribe nothing
-				if(subClasses.equals("")){
+				// if client subscribe nothing
+				if (subClasses.equals("")) {
 					toClient.writeUTF("true");
-				}
-				else{
-					//if client subscribe news
+					toClient.writeUTF(sdf);
+				} else {
+					// if client subscribe news
 					String[] s;
 					s = subClasses.split("\n");
-					for(int i=0;i<selectedNum;i++){
-						result = SubscribeDao.getInstance().saveSubscribe(username, s[i]);
+					for (int i = 0; i < selectedNum; i++) {
+						result = SubscribeDao.getInstance().saveSubscribe(
+								username, s[i]);
 					}
-					
-					SimpleDateFormat format=new SimpleDateFormat("yyyyMMddhhmmss");
-					String sdf = format.format(new Date());
-					//if write data into database successfully
-					if(result == true){
-						//write true to client
+
+					// if write data into database successfully
+					if (result == true) {
+						// write true to client
 						toClient.writeUTF("true");
 						toClient.writeUTF(sdf);
 					}
-					//if write data into database failed
+					// if write data into database failed
 					else
-						//write false to client
+						// write false to client
 						toClient.writeUTF("false");
 				}
-			}catch(InterruptedIOException ex){
+			} catch (InterruptedIOException ex) {
 				System.err.print("timeout on read");
 			}
 		} catch (IOException e) {
@@ -71,6 +74,5 @@ public class ChangeClass {
 	public void setSubClasses(String subClasses) {
 		this.subClasses = subClasses;
 	}
-	
-	
+
 }
